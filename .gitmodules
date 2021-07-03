@@ -21,3 +21,7 @@
 [submodule "External/json"]
 	path = External/json
 	url = https://github.com/nlohmann/json.git
+[submodule "External/ShaderConductor"]
+	path = External/ShaderConductor
+	url = https://github.com/KawBuma/ShaderConductor.git
+	branch = KawBuma/register-specify
