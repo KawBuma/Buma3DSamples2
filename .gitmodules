@@ -1,7 +1,6 @@
 [submodule "External/Buma3D"]
 	path = External/Buma3D
 	url = https://github.com/KawBuma/Buma3D.git
-	branch = introduce-cmake
 [submodule "External/imgui"]
 	path = External/imgui
 	url = https://github.com/ocornut/imgui.git
