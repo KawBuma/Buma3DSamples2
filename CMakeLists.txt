@@ -59,13 +59,14 @@ endfunction()
 # サブディレクトリの追加
 # ===============================================================================================
 # サードパーティー製ライブラリ
-add_subdirectory(${BMSAMP_EXTERNAL_DIR})
 
-if(NOT SPDLOG_BUILD_SHARED)
+if(NOT EXISTS SPDLOG_BUILD_SHARED OR NOT SPDLOG_BUILD_SHARED)
     # message(FATAL_ERROR "Buma3DSamples2 shares the spdlog::default_logger instance, so please set the SPDLOG_BUILD_SHARED option to ON")
     message(WARNING "Buma3DSamples2 forced SPDLOG_BUILD_SHARED to ON")
     set(SPDLOG_BUILD_SHARED ON CACHE BOOL "Build shared library (*FORCE ON from Buma3DSamples2*)" FORCE)
 endif(NOT SPDLOG_BUILD_SHARED)
+
+add_subdirectory(${BMSAMP_EXTERNAL_DIR})
 
 if(HLSL_ENABLE_DEBUG_ITERATORS)
     # HACK: HLSL_ENABLE_DEBUG_ITERATORS は DirectXShaderCompiler/cmake/modules/AddLLVM.cmake にて _ITERATOR_DEBUG_LEVEL を 0 に定義します。 これはデフォルトでOFFです。
