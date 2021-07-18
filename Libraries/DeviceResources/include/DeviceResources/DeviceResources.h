@@ -29,6 +29,8 @@ enum INTERNAL_API_TYPE
 struct DEVICE_RESOURCE_DESC
 {
     INTERNAL_API_TYPE   type;
+    bool                use_performance_adapter; // trueの場合、adapter_indexは無視され、高パフォーマンスアダプタを優先します。 
+    uint32_t            adapter_index;
     bool                is_enabled_debug;
 };
 

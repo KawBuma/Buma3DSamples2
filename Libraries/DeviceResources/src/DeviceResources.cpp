@@ -353,25 +353,43 @@ bool DeviceResources::CreateDeviceFactory()
 
 bool DeviceResources::PickAdapter()
 {
-    // 高パフォーマンスアダプタを取得
-    uint32_t cnt = 0;
-    uint64_t max_vram = 0;
-    buma3d::util::Ptr<buma3d::IDeviceAdapter> adapter_tmp{};
-    while (factory->EnumAdapters(cnt++, &adapter_tmp) != buma3d::BMRESULT_FAILED_OUT_OF_RANGE)
+    if (desc.use_performance_adapter)
     {
-        auto&& adapter_desc = adapter_tmp->GetDesc();
-        if (max_vram < adapter_desc.dedicated_video_memory)
+        // 高パフォーマンスアダプタを取得
+        uint32_t cnt = 0;
+        uint64_t max_vram = 0;
+        buma3d::util::Ptr<buma3d::IDeviceAdapter> adapter_tmp{};
+        while (factory->EnumAdapters(cnt, &adapter_tmp) != buma3d::BMRESULT_FAILED_OUT_OF_RANGE)
         {
-            max_vram = adapter_desc.dedicated_video_memory;
-            adapter = adapter_tmp;
+            auto&& adapter_desc = adapter_tmp->GetDesc();
+            if (max_vram < adapter_desc.dedicated_video_memory)
+            {
+                max_vram = adapter_desc.dedicated_video_memory;
+                adapter = adapter_tmp;
+                desc.adapter_index = cnt;
+            }
+            BUMA_LOGI("Found adapter (index {}): \n {}", cnt, TOFMT(adapter_desc));
+            cnt++;
         }
-        BUMA_LOGI("Found adapter: \n {}", TOFMT(adapter_desc));
+    }
+    else
+    {
+        if (factory->EnumAdapters(desc.adapter_index, &adapter) == buma3d::BMRESULT_FAILED_OUT_OF_RANGE)
+        {
+            BUMA_LOGE("Adapter (index {}) NOT found.", desc.adapter_index);
+            BUMA_LOGW("Trying to use 0 instead.");
+            desc.adapter_index = 0;
+            factory->EnumAdapters(0, &adapter);
+        }
     }
     if (!adapter)
+    {
+        BUMA_LOGC("ADAPTER NOT FOUND", desc.adapter_index);
         return false;
+    }
 
     auto&& d = adapter->GetDesc();
-    BUMA_LOGI("Picked adapter: \n {}", TOFMT(d));
+    BUMA_LOGI("Picked adapter: {}", desc.adapter_index);
     adapter->GetDeviceAdapterLimits(&limits);
     return true;
 }

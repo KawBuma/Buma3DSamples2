@@ -108,7 +108,7 @@ bool SampleBase::CreateDeviceResources(const char* _library_dir)
 {
     BUMA_ASSERT(dr == nullptr);
 
-    DEVICE_RESOURCE_DESC desc{ INTERNAL_API_TYPE_VULKAN, IS_DEBUG };
+    DEVICE_RESOURCE_DESC desc{ INTERNAL_API_TYPE_VULKAN, false, 0, IS_DEBUG };
 
     // 使用するAPIとデバッグの有効化をコマンドラインから取得します。
     if (platform.HasArgument("--api"))
@@ -118,7 +118,15 @@ bool SampleBase::CreateDeviceResources(const char* _library_dir)
              if (*api == "d3d12")  desc.type = INTERNAL_API_TYPE_D3D12;
         else if (*api == "vulkan") desc.type = INTERNAL_API_TYPE_VULKAN;
     }
-    if (platform.HasArgument("--b3d-debug"))
+    if (platform.HasArgument("--adapter"))
+    {
+        auto adp = ++(platform.FindArgument("--adapter"));
+        if (*adp == "performance")
+            desc.use_performance_adapter = true;
+        else
+            desc.adapter_index = std::stoul(*adp);
+    }
+    if (platform.HasArgument("--debug-b3d"))
     {
         desc.is_enabled_debug = true;
     }
