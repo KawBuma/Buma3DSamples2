@@ -27,7 +27,7 @@ SwapChain::SwapChain(DeviceResources&                          _dr
     , back_buffers            {}
 {
     swapchain_desc.surface            = surface.Get();
-    swapchain_desc.color_space        = buma3d::COLOR_SPACE_SRGB_NONLINEAR; // TODO: swapchain_desc.color_space 
+    swapchain_desc.color_space        = buma3d::COLOR_SPACE_SRGB_NONLINEAR; // TODO: swapchain_desc.color_space の指定
     swapchain_desc.pre_roration       = buma3d::ROTATION_MODE_IDENTITY;
     swapchain_desc.buffer             = _buffer;
     swapchain_desc.alpha_mode         = buma3d::SWAP_CHAIN_ALPHA_MODE_DEFAULT;
@@ -87,10 +87,10 @@ void SwapChain::Recreate(const buma3d::SWAP_CHAIN_BUFFER_DESC& _buffer, buma3d::
 
 bool SwapChain::SetName(const char* _name)
 {
-    swapchain->SetName((std::string("SwapChain ") + '('+_name+')').c_str());
+    swapchain->SetName(_name);
     for (uint32_t i = 0, size = (uint32_t)back_buffers.size(); i < size; i++)
     {
-        back_buffers[i].tex->SetName((std::string("SwapChain buffer") + std::to_string(i) + '(' + _name + ')').c_str());
+        back_buffers[i].tex->SetName((std::string(_name) + " buffer " + std::to_string(i)).c_str());
     }
 
     return true;
@@ -137,12 +137,13 @@ void SwapChain::Create()
     });
     if (it_find == supported_formats.end())
     {
-        swapchain_desc.buffer.format_desc.format = supported_formats.back().format;
-        swapchain_desc.color_space               = supported_formats.back().color_space; // TODO: supported_formats
+        swapchain_desc.buffer.format_desc.format = supported_formats.front().format;
+        swapchain_desc.color_space               = supported_formats.front().color_space;
     }
 
     auto bmr = dr.GetDevice()->CreateSwapChain(swapchain_desc, &swapchain);
     BMR_ASSERT(bmr);
+    swapchain->SetName("SwapChain");
 
     CreateBackBuffers();
     CreateViews();
@@ -158,9 +159,10 @@ void SwapChain::CreateBackBuffers()
         auto bmr = swapchain->GetBuffer(i, &tex);
         BMR_ASSERT(bmr);
 
+        auto name = swapchain->GetName();
         auto&& bb = back_buffers[i];
         bb.tex = new Texture(dr, tex.Get());
-        bb.tex->SetName((std::string("SwapChain buffer ") + std::to_string(i)).c_str());
+        bb.tex->SetName((name ? name : "Swapchain" + std::to_string(i)).c_str());
     }
 }
 
