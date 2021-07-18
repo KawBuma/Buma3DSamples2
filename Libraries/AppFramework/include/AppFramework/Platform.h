@@ -69,6 +69,9 @@ public:
 
     virtual const PLATFORM_DESC& GetDesc() const = 0;
 
+    virtual void             PrintHelpMessage() const = 0;
+    virtual void             AddHelpMessage(const char* _message) = 0;
+
     virtual ApplicationBase* CreateApplication(const char* _path) = 0;
     virtual void             DestroyApplication(ApplicationBase* _app) = 0;
     virtual void             AttachApplication(ApplicationBase* _app) = 0; // アタッチされたアプリケーションはDestroyApplicationを行う必要はありません。
@@ -87,6 +90,7 @@ protected:
 
 protected:
     std::unique_ptr<std::vector<std::string>>               cmd_lines;
+    std::unique_ptr<std::string>                            help_message;
     util::StepTimer                                         timer;
     bool                                                    is_prepared;
     bool                                                    should_exit;

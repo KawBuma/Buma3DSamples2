@@ -30,6 +30,9 @@ private:
 public:
     const PLATFORM_DESC& GetDesc() const override;
 
+    void                PrintHelpMessage() const override;
+    void                AddHelpMessage(const char* _message) override;
+
     ApplicationBase*    CreateApplication(const char* _path) override;
     void                DestroyApplication(ApplicationBase* _app) override;
     void                AttachApplication(ApplicationBase* _app) override;

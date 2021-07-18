@@ -64,6 +64,21 @@ SampleBase::SampleBase(PlatformBase& _platform)
     , command_lists           {}
     , descriptor_update       {}
 {
+    platform.AddHelpMessage(
+R"(========== SampleBase Options ========== 
+--api <api type>
+    Buma3Dが使用する内部APIを指定します。 <api type> は d3d12 または vulkan です。
+    デフォルトは vulkan です
+
+--adapter <adapter>
+    デバイスの作成に使用するアダプタを指定します。
+    <adapter> は アダプタのインデックス[0,...] または performance を指定して高パフォーマンスアダプタを優先します。
+    デフォルトは 0 です
+
+--debug-b3d
+    Buma3Dのデバッグを有効にします。
+
+)");
 }
 
 SampleBase::~SampleBase()

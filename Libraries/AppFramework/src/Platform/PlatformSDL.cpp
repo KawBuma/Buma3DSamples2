@@ -11,6 +11,7 @@
 #include <SDL.h>
 
 #include <filesystem>
+#include <iostream>
 #include <tuple>
 
 #define RET_IF_FAILED(x, result) { if (!x) return result; }
@@ -103,6 +104,16 @@ void PlatformSDL::Term()
 const PLATFORM_DESC& PlatformSDL::GetDesc() const
 {
     return desc;
+}
+
+void PlatformSDL::PrintHelpMessage() const
+{
+    std::cout << *help_message << std::endl;
+}
+
+void PlatformSDL::AddHelpMessage(const char* _message)
+{
+    help_message->append(_message);
 }
 
 ApplicationBase* PlatformSDL::CreateApplication(const char* _path)

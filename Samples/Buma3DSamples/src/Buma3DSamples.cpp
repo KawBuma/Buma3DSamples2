@@ -17,16 +17,24 @@ int main(int argc, const char** argv)
     int code = -1;
     if (platform->IsPrepared())
     {
-        if (platform->HasArgument("--app"))
+        if (platform->HasArgument("--help", "-h"))
+        {
+            platform->PrintHelpMessage();
+            code = 0;
+        }
+        else if (platform->HasArgument("--app"))
         {
             platform->AttachApplication(platform->CreateApplication((++platform->FindArgument("--app"))->c_str()));
+            code = platform->MainLoop();
         }
         else
         {
             platform->AttachApplication(platform->CreateApplication("./HelloConstantBuffer/HelloConstantBuffer"));
+            platform->PrintHelpMessage();
+            code = platform->MainLoop();
         }
-        code = platform->MainLoop();
     }
+
     buma::PlatformBase::DestroyPlatform(platform);
     return code;
 }

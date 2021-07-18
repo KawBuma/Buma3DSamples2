@@ -71,6 +71,12 @@ HelloConstantBuffer::HelloConstantBuffer(PlatformBase& _platform)
     , is_reuse_commands  {}
 {
     g_fpss = new std::remove_pointer_t<decltype(g_fpss)>;
+    platform.AddHelpMessage(
+R"(========== HelloConstantBuffer Options ==========
+--use-host-writable
+    ホスト可視ヒープに定数を書き込みます。
+
+)");
 }
 
 HelloConstantBuffer::~HelloConstantBuffer()

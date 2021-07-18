@@ -22,17 +22,33 @@ bool PlatformBase::HasArgument(const char* _find_str)
 
 PlatformBase::PlatformBase()
     : cmd_lines     {}
+    , help_message  {}
     , timer         {}
     , is_prepared   {}
     , should_exit   {}
     , attached_app  {}
 {
     cmd_lines = std::make_unique<std::vector<std::string>>();
+    help_message = std::make_unique<std::string>(
+R"(USAGE: Buma3DSamples.exe Options <User Inputs>
+Options:
+--help, -h
+    ヘルプメッセージを表示します。
+
+--app <application path>
+    起動するアプリケーションモジュールの、拡張子を含まないファイル名を指定します。
+    for instance: --app HelloTriangle/HelloTriangle 
+
+--enable-log
+    ログのファイル出力を有効にします。
+
+)");
 }
 
 PlatformBase::~PlatformBase()
 {
     cmd_lines.reset();
+    help_message.reset();
 }
 
 
