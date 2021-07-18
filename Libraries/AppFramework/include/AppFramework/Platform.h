@@ -61,6 +61,12 @@ public:
     std::vector<std::string>::const_iterator FindArgument(const char* _find_str);
     bool                                     HasArgument(const char* _find_str);
 
+    template<typename Head, typename... Find>
+    std::vector<std::string>::const_iterator FindArgument(Head _find_str, Find... _tail) { return HasArgument(_find_str) ? FindArgument(_find_str) : FindArgument(_tail...); }
+
+    template<typename Head, typename... Find>
+    bool                                     HasArgument(Head _find_str, Find... _tail) { return HasArgument(_find_str) || HasArgument(_tail...); }
+
     virtual const PLATFORM_DESC& GetDesc() const = 0;
 
     virtual ApplicationBase* CreateApplication(const char* _path) = 0;
