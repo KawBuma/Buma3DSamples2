@@ -42,7 +42,7 @@ public:
         , frames_per_second  {}
         , max_delta          {}
     {
-        SetMaxDelta(1.0 / 120.0);
+        SetMaxDelta(1.0 / 20.0);
     }
 
     void Reset()
@@ -60,8 +60,6 @@ public:
     {
         auto&& now = clock_t::now();
         elapsed_ticks = now - last_clock;
-        if (elapsed_ticks > max_delta)
-            elapsed_ticks = max_delta;
 
         last_clock = now;
 
@@ -76,6 +74,8 @@ public:
             frames_this_second = 0;
             ticks_this_second %= ticks_per_second;
         }
+        if (elapsed_ticks > max_delta)
+            elapsed_ticks = max_delta;
     }
 
     uint64_t    GetElapsedTicks()   const { return static_cast<uint64_t>(elapsed_ticks.count()); }
