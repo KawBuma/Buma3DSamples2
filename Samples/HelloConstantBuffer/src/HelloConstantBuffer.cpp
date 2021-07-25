@@ -185,9 +185,9 @@ bool HelloConstantBuffer::OnInit()
     CreateDeviceResources();
 
     buffer_count = 3;
-    buma3d::SWAP_CHAIN_FLAGS flags = buma3d::SWAP_CHAIN_FLAG_DISABLE_VERTICAL_SYNC |
-                                     buma3d::SWAP_CHAIN_FLAG_ALLOW_DISCARD_AFTER_PRESENT;
-    auto buffer_desc = init::SwapChainBufferDesc(1280, 720, buffer_count, { buma3d::RESOURCE_FORMAT_B8G8R8A8_UNORM }, buma3d::SWAP_CHAIN_BUFFER_FLAG_COLOR_ATTACHMENT);
+    buma3d::SWAP_CHAIN_FLAGS flags = buma3d::SWAP_CHAIN_FLAG_DISABLE_VERTICAL_SYNC
+                                   | buma3d::SWAP_CHAIN_FLAG_ALLOW_DISCARD_AFTER_PRESENT;
+    auto buffer_desc = init::SwapChainBufferDesc(1280, 720, buffer_count, { buma3d::RESOURCE_FORMAT_B8G8R8A8_UNORM/*default*/ }, buma3d::SWAP_CHAIN_BUFFER_FLAG_COLOR_ATTACHMENT);
     CreateSwapChain(buffer_desc, flags);
     CreateFencesForSwapChain();
 
@@ -199,6 +199,7 @@ bool HelloConstantBuffer::OnInit()
     g_cam.setPerspective(60.0f, window->GetAspectRatio(), 1.0f, 256.0f);
 
     USE_HOST_WRITABLE_HEAP = platform.HasArgument("--use-host-writable");
+    BUMA_LOGI("USE_HOST_WRITABLE_HEAP {}", USE_HOST_WRITABLE_HEAP);
 
     CreateCommandAllocator();
     CreateCommandLists();
@@ -750,7 +751,7 @@ void HelloConstantBuffer::PrepareFrame(uint32_t _buffer_index, float _deltatime)
         static float sx = 0.f;
         sc = sc + 0.34f * _deltatime;
         sx = fabsf(sinf(sc));
-        b::CLEAR_VALUE            clear_val{ b::CLEAR_RENDER_TARGET_VALUE{0.9f * sx ,0.28f,0.13f,1.f} };
+        b::CLEAR_VALUE            clear_val{ b::CLEAR_RENDER_TARGET_VALUE{0.9f * sx , 0.28f, 0.13f, 1.f} };
         b::RENDER_PASS_BEGIN_DESC rpbd{ render_pass.Get(), framebuffers[_buffer_index].Get(), 1, &clear_val };
         b::SUBPASS_BEGIN_DESC     spbd{ b::SUBPASS_CONTENTS_INLINE };
         l->BeginRenderPass(rpbd, spbd);
