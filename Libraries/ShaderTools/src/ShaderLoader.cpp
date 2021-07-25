@@ -190,6 +190,14 @@ void ShaderLoader::LoadShaderFromHLSL(COMPILE_TARGET _type, const LOAD_SHADER_DE
     SCC::Options opt{};
     PrepareOptions(opt, _desc.options, _type, shifts, _desc.stage);
 
+    /*
+    NOTE: src.fileName が nulltpr の場合、"hlsl.hlsl" が読み込まれます。
+          DirectXShaderCompiler/tools/clang/tools/dxcompiler/dxcompilerobj.cpp : DxcCompiler::Compile 関数内にて、ファイル名が指定されていない場合、
+          "hlsl.hlsl" という文字列がデフォルトで設定されますが、実際に "hlsl.hlsl" が存在しない場合、 
+          DirectXShaderCompiler/tools/clang/lib/SPIRV/EmitVisitor.cpp : EmitVisitor::visit 関数内 ReadSourceCode() が失敗します。
+          また、空のファイルの場合、 .empty() 条件式によって同様に失敗とみなされます。
+          コメント等を含めた hlsl.hlsl ダミーファイルをカレントディレクトリに配置し、これを回避します。 
+    */
     SCC::SourceDesc src{
           _src                                      // source
         , _desc.filename                            // fileName
