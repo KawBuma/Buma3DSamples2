@@ -13,6 +13,23 @@
 namespace buma
 {
 
+class dummy_mutex
+{
+public:
+    dummy_mutex(int _Flags = 0) noexcept { BUMA_UNREDERENCED(_Flags); }
+    ~dummy_mutex() noexcept {}
+    dummy_mutex(const dummy_mutex&) = delete;
+    dummy_mutex& operator=(const dummy_mutex&) = delete;
+
+    void            lock() {}
+    _NODISCARD bool try_lock() { return true; }
+    void            unlock() {}
+
+    using native_handle_type = void*;
+    _NODISCARD native_handle_type native_handle() { return nullptr; }
+};
+
+
 class CommandListChain
 {
     using FenceInfo = std::tuple<buma3d::IFence*, uint64_t>;
@@ -75,6 +92,18 @@ public:
         std::lock_guard lock(mutex);
         prepend_submits.wait_fences.emplace_front(_fence, _fence_value);
     }
+    void PrependSubmitInfo(const buma3d::SUBMIT_INFO& _info)
+    {
+        std::lock_guard lock(mutex);
+        for (uint32_t i = 0; i < _info.num_command_lists_to_execute; i++)
+            prepend_submits.command_lists.emplace_back(_info.command_lists_to_execute[i]);
+
+        for (uint32_t i = 0; i < _info.wait_fence.num_fences; i++)
+            prepend_submits.wait_fences.emplace_back(_info.wait_fence.fences[i], _info.wait_fence.fence_values[i]);
+
+        for (uint32_t i = 0; i < _info.signal_fence.num_fences; i++)
+            prepend_submits.signal_fences.emplace_back(_info.signal_fence.fences[i], _info.signal_fence.fence_values[i]);
+    }
 
     void AddCommandList(uint64_t _order, buma3d::ICommandList* _list)
     {
@@ -90,6 +119,19 @@ public:
     {
         std::lock_guard lock(mutex);
         submits[_order].wait_fences.emplace_back(_fence, _fence_value);
+    }
+    void AddSubmitInfo(uint64_t _order, const buma3d::SUBMIT_INFO& _info)
+    {
+        std::lock_guard lock(mutex);
+        auto&& s = submits[_order];
+        for (uint32_t i = 0; i < _info.num_command_lists_to_execute; i++)
+            s.command_lists.emplace_back(_info.command_lists_to_execute[i]);
+
+        for (uint32_t i = 0; i < _info.wait_fence.num_fences; i++)
+            s.wait_fences.emplace_back(_info.wait_fence.fences[i], _info.wait_fence.fence_values[i]);
+
+        for (uint32_t i = 0; i < _info.signal_fence.num_fences; i++)
+            s.signal_fences.emplace_back(_info.signal_fence.fences[i], _info.signal_fence.fence_values[i]);
     }
 
     bool HasPrependedCommand() const
@@ -149,7 +191,8 @@ public:
     }
 
 private:
-    mutable std::mutex              mutex;
+    //mutable std::mutex              mutex;
+    mutable dummy_mutex             mutex;
     SUBMIT<std::deque>              prepend_submits;
     std::map<uint64_t, SUBMIT<>>    submits;
     util::SubmitDesc                submit_desc;

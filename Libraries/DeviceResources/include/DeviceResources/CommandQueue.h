@@ -29,10 +29,12 @@ public:
     void PrependCommandList(buma3d::ICommandList* _list)                       { chain.PrependCommandList(_list); }
     void PrependSignalFence(buma3d::IFence* _fence, uint64_t _fence_value = 0) { chain.PrependSignalFence(_fence, _fence_value); }
     void PrependWaitFence  (buma3d::IFence* _fence, uint64_t _fence_value = 0) { chain.PrependWaitFence(_fence, _fence_value); }
+    void PrependSubmitInfo (const buma3d::SUBMIT_INFO& _info)                  { chain.PrependSubmitInfo(_info); }
 
     void AddCommandList(uint64_t _order, buma3d::ICommandList* _list)                       { chain.AddCommandList(_order, _list); }
     void AddSignalFence(uint64_t _order, buma3d::IFence* _fence, uint64_t _fence_value = 0) { chain.AddSignalFence(_order, _fence, _fence_value); }
     void AddWaitFence  (uint64_t _order, buma3d::IFence* _fence, uint64_t _fence_value = 0) { chain.AddWaitFence(_order, _fence, _fence_value); }
+    void AddSubmitInfo (uint64_t _order, const buma3d::SUBMIT_INFO& _info)                  { chain.AddSubmitInfo(_order, _info); }
 
     bool HasPrependedCommand()             const { return chain.HasPrependedCommand(); }
     bool HasCommand(uint64_t _in_order)    const { return chain.HasCommand(_in_order); }
@@ -59,7 +61,8 @@ public:
     uint64_t SubmitFromDr();
 
 private:
-    mutable std::mutex                          mutex;
+    //mutable std::mutex                          mutex;
+    mutable dummy_mutex                         mutex;
     DeviceResources&                            dr;
     buma3d::COMMAND_TYPE                        command_type;
     buma3d::util::Ptr<buma3d::ICommandQueue>    command_queue;

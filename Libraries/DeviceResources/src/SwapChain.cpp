@@ -49,11 +49,10 @@ SwapChain::~SwapChain()
 
 buma3d::BMRESULT SwapChain::AcquireNextBuffer(uint32_t _timeout_millisec, uint32_t* _dst_back_buffer_index)
 {
-    uint32_t next_buffer_index = 0;
-    auto bmr = swapchain->AcquireNextBuffer(acquire_info, &next_buffer_index);
+    acquire_info.timeout_millisec = _timeout_millisec;
+    auto bmr = swapchain->AcquireNextBuffer(acquire_info, &back_buffer_index);
 
-    back_buffer_index = next_buffer_index;
-    *_dst_back_buffer_index = next_buffer_index;
+    *_dst_back_buffer_index = back_buffer_index;
     return bmr;
 }
 

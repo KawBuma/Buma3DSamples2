@@ -124,7 +124,7 @@ DeviceResources::DeviceResources(const DEVICE_RESOURCE_DESC& _desc, const char* 
     , adapter                  {}
     , device                   {}
     , limits                   {}
-    , cmd_queues               {}    
+    , cmd_queues               {}
     , queue_props              {}
     , resource_heaps_allocator {}
     , resource_heap_props      {}
@@ -368,7 +368,7 @@ bool DeviceResources::PickAdapter()
                 adapter = adapter_tmp;
                 desc.adapter_index = cnt;
             }
-            BUMA_LOGI("Found adapter (index {}): \n {}", cnt, TOFMT(adapter_desc));
+            BUMA_LOGI("Found adapter index {}: {} ({} Mib)", cnt, adapter_desc.device_name, adapter_desc.dedicated_video_memory / util::Mib(1));
             cnt++;
         }
     }
@@ -376,7 +376,7 @@ bool DeviceResources::PickAdapter()
     {
         if (factory->EnumAdapters(desc.adapter_index, &adapter) == buma3d::BMRESULT_FAILED_OUT_OF_RANGE)
         {
-            BUMA_LOGE("Adapter (index {}) NOT found.", desc.adapter_index);
+            BUMA_LOGE("Adapter index {} NOT found.", desc.adapter_index);
             BUMA_LOGW("Trying to use 0 instead.");
             desc.adapter_index = 0;
             factory->EnumAdapters(0, &adapter);
@@ -384,12 +384,12 @@ bool DeviceResources::PickAdapter()
     }
     if (!adapter)
     {
-        BUMA_LOGC("ADAPTER NOT FOUND", desc.adapter_index);
+        BUMA_LOGC("NO ADAPTER FOUND");
         return false;
     }
 
-    auto&& d = adapter->GetDesc();
-    BUMA_LOGI("Picked adapter: {}", desc.adapter_index);
+    BUMA_LOGI("Picked adapter index {} :\n{}", desc.adapter_index, TOFMT(adapter->GetDesc()));
+
     adapter->GetDeviceAdapterLimits(&limits);
     return true;
 }
@@ -416,10 +416,10 @@ bool DeviceResources::CreateDevice()
         qd.flags = buma3d::COMMAND_QUEUE_FLAG_NONE;
 
         /*
-        HACK: プロファイラーのクラッシュを防ぐためにコマンドキューは必要最低限のインスタンス数で作成します。 
+        HACK: プロファイラーのクラッシュを防ぐためにコマンドキューは必要最低限のインスタンス数で作成します。
               コマンドキューを複数作成すると、プロファイラー(PIX,RenderDoc,Nsight)がコマンドの解析時にほとんどクラッシュする現象を確認しました。
               複数のキューを作成し、そのうちの1つしか使用しない場合でも、クラッシュが発生します。
-              何らかの特殊なケースではない限り、コマンドキューの数は各タイプ毎に1つとします。 
+              何らかの特殊なケースではない限り、コマンドキューの数は各タイプ毎に1つとします。
         */
         //qd.num_queues = std::min(std::thread::hardware_concurrency(), queue_props[i].num_max_queues);
         qd.num_queues = 1;
