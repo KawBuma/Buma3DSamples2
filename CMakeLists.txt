@@ -18,6 +18,9 @@ set(BMSAMP_EXTERNAL_DIR  ${CMAKE_SOURCE_DIR}/External)
 set(BMSAMP_LIBRARY_DIR   ${CMAKE_SOURCE_DIR}/Libraries)
 set(BMSAMP_SAMPLES_DIR   ${CMAKE_SOURCE_DIR}/Samples)
 
+# ビルドされたサンプルを統合するディレクトリ
+set(PACKAGE_DIR ${CMAKE_BINARY_DIR}/built)
+
 # ===============================================================================================
 # コンパイルオプションの伝播ライブラリ
 # ===============================================================================================

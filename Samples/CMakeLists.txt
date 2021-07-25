@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
 
-# ビルドされたサンプルを統合するディレクトリ
-set(PACKAGE_DIR ${CMAKE_BINARY_DIR}/built)
-
 # サンプルアプリケーションの実行可能ファイル
 add_subdirectory(${BMSAMP_SAMPLES_DIR}/Buma3DSamples)
 
@@ -33,6 +30,6 @@ endfunction()
 # サンプルアプリケーションを追加
 add_subdirectory(${BMSAMP_SAMPLES_DIR}/HelloTriangle)
 add_subdirectory(${BMSAMP_SAMPLES_DIR}/HelloConstantBuffer)
-# add_subdirectory(${BMSAMP_SAMPLES_DIR}/HelloTexture)
-# add_subdirectory(${BMSAMP_SAMPLES_DIR}/HelloImGui)
+add_subdirectory(${BMSAMP_SAMPLES_DIR}/HelloTexture)
+add_subdirectory(${BMSAMP_SAMPLES_DIR}/HelloImGui)
 # add_subdirectory(${BMSAMP_SAMPLES_DIR}/SceneRendering)
