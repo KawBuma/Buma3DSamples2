@@ -273,7 +273,9 @@ void HelloTriangle::CreateWindow(uint32_t _w, uint32_t _h, const char* _title)
 
 bool HelloTriangle::CreateDeviceResources()
 {
-    DEVICE_RESOURCE_DESC desc{ INTERNAL_API_TYPE_VULKAN, IS_DEBUG };
+    BUMA_ASSERT(dr == nullptr);
+
+    DEVICE_RESOURCE_DESC desc{ INTERNAL_API_TYPE_VULKAN, false, 0, IS_DEBUG };
 
     // 使用するAPIとデバッグの有効化をコマンドラインから取得します。
     if (platform.HasArgument("--api"))
@@ -283,6 +285,14 @@ bool HelloTriangle::CreateDeviceResources()
              if (*api == "d3d12")  desc.type = INTERNAL_API_TYPE_D3D12;
         else if (*api == "vulkan") desc.type = INTERNAL_API_TYPE_VULKAN;
     }
+    if (platform.HasArgument("--adapter"))
+    {
+        auto adp = ++(platform.FindArgument("--adapter"));
+        if (*adp == "performance")
+            desc.use_performance_adapter = true;
+        else
+            desc.adapter_index = std::stoul(*adp);
+    }
     if (platform.HasArgument("--debug-b3d"))
     {
         desc.is_enabled_debug = true;
@@ -290,8 +300,7 @@ bool HelloTriangle::CreateDeviceResources()
 
     dr = std::make_unique<DeviceResources>(desc, nullptr);
     adapter = dr->GetAdapter();
-    device = dr->GetDevice();
-    command_queue = dr->GetCommandQueues(b::COMMAND_TYPE_DIRECT)[0]->GetCommandQueue();
+    device  = dr->GetDevice();
 
     return true;
 }
@@ -306,10 +315,20 @@ bool HelloTriangle::InitSwapChain()
     auto bmr = adapter->CreateSurface(sd, &surface);
     BMR_ASSERT(bmr);
 
+    // プレゼントを実行するコマンドキューを取得
+    for (uint32_t i = 0; i < (uint32_t)buma3d::COMMAND_TYPE_NUM_TYPES; i++)
+    {
+        if (adapter->QueryPresentationSupport(buma3d::COMMAND_TYPE(i), surface.Get()) == b::BMRESULT_SUCCEED)
+        {
+            device->GetCommandQueue(buma3d::COMMAND_TYPE(i), 0, &command_queue);
+            break;
+        }
+    }
+
     // 利用可能なサーフェスフォーマットを取得
     std::vector<b::SURFACE_FORMAT> surface_formats(surface->GetSupportedSurfaceFormats(nullptr));
     surface->GetSupportedSurfaceFormats(surface_formats.data());
-    auto&& sf = surface_formats.back();
+    auto&& sf = surface_formats.front();
 
     // スワップチェインを作成
     auto scd = init::SwapChainDesc(surface.Get(), sf.color_space,
@@ -1121,7 +1140,7 @@ void HelloTriangle::Render(float _deltatime)
     b::BMRESULT bmr{};
     // コマンドリストとフェンスを送信
     {
-        // acquireしたバックバッファを利用するコマンドリストの実行完了をCPUで待機します。 
+        // acquireしたバックバッファを利用するコマンドリストの実行完了をCPUで待機します。
         bmr = cmd_fences[back_buffer_index]->Wait(0, UINT32_MAX);
         BMR_ASSERT(bmr);
         bmr = cmd_fences[back_buffer_index]->Reset();

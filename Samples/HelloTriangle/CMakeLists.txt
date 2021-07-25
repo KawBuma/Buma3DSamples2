@@ -23,7 +23,8 @@ endif(MSVC)
 
 source_group(Shaders FILES ${SHADERS})
 
+# シェーダーファイルはライブラリのリビルドを行わない限り copy_if_different によって変更の検知が行われないようです。
+# 代わりに変更されたかどうかに関わらずコピーを行う copy_directory を使用します。
 add_custom_command(TARGET ${TARGET} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}/$<CONFIG>/${TARGET}/shader
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADERS} ${PACKAGE_DIR}/$<CONFIG>/${TARGET}/shader
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PACKAGE_DIR}/$<CONFIG>/${TARGET}/shader
 )
