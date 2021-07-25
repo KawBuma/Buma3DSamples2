@@ -15,4 +15,4 @@ add_library(SampleBase ${PUBLIC_INCLUDES} ${SRCS})
 
 target_include_directories(SampleBase PUBLIC ${INCLUDE_DIR} PRIVATE ${SRC_DIR})
 
-target_link_libraries(SampleBase PUBLIC glm::glm AppFramework DeviceResources ShaderTools)
+target_link_libraries(SampleBase PUBLIC glm::glm AppFramework DeviceResources TextureLoads ShaderTools)

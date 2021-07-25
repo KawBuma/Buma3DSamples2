@@ -185,7 +185,12 @@ public:
     bool update(float deltaTime)
     {
         if (!moving())
+        {
+            mouse.delta.x = 0.f;
+            mouse.delta.y = 0.f;
+            mouse.wheel = 0.f;
             return false;
+        }
 
         if (type == CameraType::firstperson)
         {
@@ -212,13 +217,12 @@ public:
             if (mouse.left)
                 rotate(glm::vec3(mouse.delta.y * rotationSpeed, mouse.delta.x * rotationSpeed, 0.0f));
             if (mouse.right)
-                translate(glm::vec3(-0.0f, 0.0f, mouse.delta.y * .005f));
+                translate(glm::vec3(-0.0f, 0.0f, mouse.delta.y * -.005f));
             if (mouse.middle)
                 translate(glm::vec3(mouse.delta.x * 0.005f, -mouse.delta.y * 0.005f, 0.0f));
             if (mouse.wheel != 0.f)
                 translate(glm::vec3(0.0f, 0.0f, mouse.wheel * 0.05f));
             updateViewMatrix();
-
         }
         mouse.delta.x = 0.f;
         mouse.delta.y = 0.f;
