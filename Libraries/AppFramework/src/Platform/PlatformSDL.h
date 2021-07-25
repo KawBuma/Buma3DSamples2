@@ -50,7 +50,7 @@ private:
     void OnSDLDisplayEvent(SDL_Event& e);
     void OnSDLWindowEvent(SDL_Event& e);
     void OnSDLSystemEvent(SDL_Event& e);
-    static int SDLCunstomEventFilter(void* _userdata, SDL_Event* _event);
+    static int SDLCustomEventFilter(void* _userdata, SDL_Event* _event);
     void DestroyPendings();
     bool WasDestroyed(const ApplicationBase* _app) const;
 

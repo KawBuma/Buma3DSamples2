@@ -191,22 +191,34 @@ void PlatformSDL::DestroyWindow(WindowBase* _window)
     windows.erase(it_find);
 }
 
-int PlatformSDL::SDLCunstomEventFilter(void* _userdata, SDL_Event* _event)
+int PlatformSDL::SDLCustomEventFilter(void* _userdata, SDL_Event* _event)
 {
-    if (_event->type == SDL_WINDOWEVENT)
+    auto&& t = *static_cast<PlatformSDL*>(_userdata);
+    auto&& e = *_event;
+    switch (_event->type)
     {
-        auto t = static_cast<PlatformSDL*>(_userdata);
+    case SDL_WINDOWEVENT:
         if (_event->window.event == SDL_WINDOWEVENT_RESIZED)
         {
-            t->OnSDLWindowEvent(*_event);
+            t.OnSDLWindowEvent(e);
             return 0;
         }
+        break;
+
+    case SDL_MOUSEMOTION:
+        t.attached_app->OnMouseMove(MouseMoveEventArgs(&e.motion));
+        return 0;
+        break;
+
+    default:
+        break;
     }
+
     return 1;
 }
 int PlatformSDL::MainLoop()
 {
-    SDL_SetEventFilter(SDLCunstomEventFilter, this);
+    SDL_SetEventFilter(SDLCustomEventFilter, this);
     while (ProcessMessage())
     {
         timer.Tick();
