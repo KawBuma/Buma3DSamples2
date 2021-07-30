@@ -159,6 +159,8 @@ void PlatformSDL::DestroyApplication(ApplicationBase* _app)
         auto Destroy = reinterpret_cast<buma::PFN_DestroyApplication>(SDL_LoadFunction(it_find->second, "DestroyApplication"));
         BUMA_ASSERT(Destroy);
         Destroy(it_find->first);
+        if (attached_app == it_find->first)
+            attached_app = nullptr;
         SDL_UnloadObject(it_find->second);
         applications.erase(it_find);
     });
@@ -363,8 +365,11 @@ bool PlatformSDL::ProcessMessage()
             break;
         }
 
-        auto a = ProcessMessageEventArgs::PROCESS_MESSAGE_EVENT_ARGS_SDL({ &e });
-        attached_app->OnProcessMessage(ProcessMessageEventArgs(PLATFORM_TYPE_SDL, (void*)&a));
+        if (attached_app)
+        {
+            auto a = ProcessMessageEventArgs::PROCESS_MESSAGE_EVENT_ARGS_SDL({ &e });
+            attached_app->OnProcessMessage(ProcessMessageEventArgs(PLATFORM_TYPE_SDL, (void*)&a));
+        }
     }
 
     return !should_exit;
