@@ -9,10 +9,10 @@ namespace shader
 
 struct SHADER_MODEL
 {
-    uint8_t major_ver : 6;
-    uint8_t minor_ver : 2;
+    uint8_t major_ver;
+    uint8_t minor_ver;
 
-    uint32_t FullVersion() const noexcept { return (major_ver << 2) | minor_ver; }
+    uint16_t FullVersion() const noexcept { return (major_ver << 8) | minor_ver; }
 
     bool operator< (const SHADER_MODEL& other) const noexcept { return this->FullVersion() < other.FullVersion(); }
     bool operator==(const SHADER_MODEL& other) const noexcept { return this->FullVersion() == other.FullVersion(); }
