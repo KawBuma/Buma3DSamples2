@@ -5,7 +5,6 @@ add_subdirectory(${BMSAMP_EXTERNAL_DIR}/glm) # uninstall
 add_subdirectory(${BMSAMP_EXTERNAL_DIR}/spdlog)
 add_subdirectory(${BMSAMP_EXTERNAL_DIR}/SDL)
 add_subdirectory(${BMSAMP_EXTERNAL_DIR}/json)
-add_subdirectory(${BMSAMP_EXTERNAL_DIR}/ShaderConductor)
 
 set_target_properties(glm           PROPERTIES FOLDER External)
 set_target_properties(uninstall     PROPERTIES FOLDER External)
@@ -13,7 +12,6 @@ set_target_properties(spdlog        PROPERTIES FOLDER External)
 set_target_properties(nlohmann_json PROPERTIES FOLDER External)
 
 set_nest_folder_property_in(${BMSAMP_EXTERNAL_DIR}/SDL             External/SDL)
-set_nest_folder_property_in(${BMSAMP_EXTERNAL_DIR}/ShaderConductor External/ShaderConductor)
 
 # ===============================================================================================
 # imgui
@@ -73,3 +71,40 @@ add_library(stb INTERFACE
 )
 target_include_directories(stb INTERFACE ${BMSAMP_EXTERNAL_DIR}/stb)
 set_target_properties(stb PROPERTIES FOLDER External)
+
+
+# ===============================================================================================
+# DirectXShaderCompiler
+# ===============================================================================================
+set(BMSMP_DXC_DOWNLOAD_DIR  "${CMAKE_CURRENT_BINARY_DIR}/DirectXShaderCompiler")
+set(BMSMP_DXC_INCLUDE_DIR   "${BMSMP_DXC_DOWNLOAD_DIR}/inc")
+set(BMSMP_DXC_LIBRARY_DIR   "${BMSMP_DXC_DOWNLOAD_DIR}/bin/x64")
+set(BMSMP_DXC_VERSION       "v1.6.2106")
+set(BMSMP_DXC_FILENAME      "dxc_2021_07_01.zip")
+
+# DXC の Release をダウンロードします
+# TODO: Windows 以外での環境をサポート; ReleaseではWindows用バイナリ以外提供されていません。
+include(FetchContent)
+FetchContent_Declare(DirectXShaderCompiler
+    URL                 https://github.com/microsoft/DirectXShaderCompiler/releases/download/${BMSMP_DXC_VERSION}/${BMSMP_DXC_FILENAME}
+    DOWNLOAD_DIR        ${BMSMP_DXC_DOWNLOAD_DIR}
+    LOG_DOWNLOAD        1
+    SOURCE_DIR          ${BMSMP_DXC_DOWNLOAD_DIR}
+    CONFIGURE_COMMAND   ${CMAKE_COMMAND} -E tar -xf ${BMSMP_DXC_DOWNLOAD_DIR}/${BMSMP_DXC_FILENAME}
+    LOG_CONFIGURE       1
+)
+
+FetchContent_GetProperties(DirectXShaderCompiler)
+if(NOT DirectXShaderCompiler_POPULATED)
+    FetchContent_Populate(DirectXShaderCompiler)
+endif()
+
+add_library(DirectXShaderCompiler INTERFACE
+    ${BMSMP_DXC_INCLUDE_DIR}/d3d12shader.h
+    ${BMSMP_DXC_INCLUDE_DIR}/dxcapi.h
+)
+target_include_directories(DirectXShaderCompiler INTERFACE ${BMSMP_DXC_INCLUDE_DIR})
+set_target_properties(DirectXShaderCompiler PROPERTIES FOLDER External)
+
+# カスタムプロパティのセット
+set_target_properties(DirectXShaderCompiler PROPERTIES DXC_LIBRARY_DIR ${BMSMP_DXC_LIBRARY_DIR})

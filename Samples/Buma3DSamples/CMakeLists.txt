@@ -13,8 +13,7 @@ if(MSVC)
 endif(MSVC)
 
 add_custom_command(TARGET Buma3DSamples POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:dxcompiler> $<TARGET_FILE_DIR:Buma3DSamples>
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:ShaderConductor> $<TARGET_FILE_DIR:Buma3DSamples>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory $<TARGET_PROPERTY:DirectXShaderCompiler,DXC_LIBRARY_DIR> $<TARGET_FILE_DIR:Buma3DSamples>
 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL2> $<TARGET_FILE_DIR:Buma3DSamples>
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:spdlog> $<TARGET_FILE_DIR:Buma3DSamples>
@@ -27,7 +26,6 @@ if(BMSAMP_USE_D3D12)
     set(DXIL_PATH "C:/Program Files (x86)/Windows Kits/10/Redist/D3D/x64/dxil.dll")
     add_custom_command(TARGET Buma3DSamples POST_BUILD
         DEPENDS Buma3D_D3D12
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DXIL_PATH} $<TARGET_FILE_DIR:Buma3DSamples>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WinPixEventRuntime_DLL_PATH} $<TARGET_FILE_DIR:Buma3DSamples>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Buma3D_D3D12> $<TARGET_FILE_DIR:Buma3DSamples>
     )

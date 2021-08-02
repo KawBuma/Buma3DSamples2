@@ -71,32 +71,6 @@ endif(NOT SPDLOG_BUILD_SHARED)
 
 add_subdirectory(${BMSAMP_EXTERNAL_DIR})
 
-if(HLSL_ENABLE_DEBUG_ITERATORS)
-    # HACK: HLSL_ENABLE_DEBUG_ITERATORS は DirectXShaderCompiler/cmake/modules/AddLLVM.cmake にて _ITERATOR_DEBUG_LEVEL を 0 に定義します。 これはデフォルトでOFFです。
-    # ShaderConductor/External/DirectXShaderCompiler.cmake 内でONに強制されますが、これによって
-    # ShaderConductor/External/DirectXShaderCompiler/lib/HLSL/DxilContainerReflection.cpp の DxilModuleReflection::_GetConstantBufferByName の実装で
-    # イテレータの不一致によるアサーション失敗が引き起こされます。
-    set(HLSL_ENABLE_DEBUG_ITERATORS OFF CACHE BOOL "Disable debug iterators for faster debug and to remove some additional allocations with improper noexcept attribution (*FORCE OFF from Buma3DSamples2*)" FORCE)
-
-    # 実際にプリプロセッサへ反映するために set_property を使用して _ITERATOR_DEBUG_LEVEL=0 を追加します。 (_ITERATOR_DEBUG_LEVEL=0 はディレクトリプロパティに追加されていました)
-    set(DXC_TARGETS )
-    get_all_targets_in(${BMSAMP_EXTERNAL_DIR}/ShaderConductor/External/DirectXShaderCompiler DXC_TARGETS)
-    foreach(T IN LISTS DXC_TARGETS)
-        set_property(TARGET ${T} APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    endforeach()
-
-    # 同様にShaderConductorの依存関係に追加します
-    set_property(TARGET ShaderConductor    APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    set_property(TARGET SPIRV-Tools-opt    APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    set_property(TARGET SPIRV-Tools-static APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-
-    set_property(TARGET spirv-cross-core   APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    set_property(TARGET spirv-cross-glsl   APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    set_property(TARGET spirv-cross-hlsl   APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    set_property(TARGET spirv-cross-msl    APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-    set_property(TARGET spirv-cross-util   APPEND PROPERTY COMPILE_DEFINITIONS _ITERATOR_DEBUG_LEVEL=0)
-endif(HLSL_ENABLE_DEBUG_ITERATORS)
-
 # Buma3D
 add_subdirectory(${BMSAMP_EXTERNAL_DIR}/Buma3D)
 set_nest_folder_property_in(${BMSAMP_EXTERNAL_DIR}/Buma3D Buma3D)

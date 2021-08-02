@@ -11,14 +11,7 @@ using ComPtr = Microsoft::WRL::ComPtr<T>;
 #endif // !_WIN32
 
 #include <d3d12shader.h>
-#include <dxc/dxcapi.h>
-
-
-// 'std::iterator<std::input_iterator_tag,const hlsl::DxilContainerHeader *,ptrdiff_t,const hlsl::DxilContainerHeader **,const hlsl::DxilContainerHeader *&>':
-// warning STL4015: The std::iterator class template (used as a base class to provide typedefs) is deprecated in C++17.(The <iterator> header is NOT deprecated.)
-#pragma warning(disable : 4996)
-#include <dxc/DxilContainer/DxilContainer.h>
-#pragma warning(default : 4996)
+#include <dxcapi.h>
 
 #define ASSERT_HR(hr) assert(SUCCEEDED(hr))
 
@@ -49,7 +42,7 @@ static void CreateDxcReflectionFromBlob(const std::vector<uint8_t>& _buffer, Com
     ASSERT_HR(hr);
 
     uint32_t dxil_part_index = ~0u;
-    hr = container_reflection->FindFirstPartKind(hlsl::DFCC_DXIL, &dxil_part_index);
+    hr = container_reflection->FindFirstPartKind(DXC_PART_DXIL, &dxil_part_index);
     ASSERT_HR(hr);
     hr = container_reflection->GetPartReflection(dxil_part_index, IID_PPV_ARGS(&_out_reflection));
     ASSERT_HR(hr);
